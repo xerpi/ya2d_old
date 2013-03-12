@@ -149,6 +149,8 @@
         png_structp  png_ptr  = NULL;
         png_infop    info_ptr = NULL;
         SceUID       fp;
+        png_bytep *rowPointers;
+		int i;
 
         if(!(fp = sceIoOpen(filename, PSP_O_RDONLY, 0777)))
             goto exit_error;
@@ -218,20 +220,12 @@
         texp->dataLength = texp->rowBytes * texp->textureHeight;
         texp->data = (uint8_t *)memalign(16, texp->dataLength * 4);
 
-        //memset(texp->data, 0x0, texp->dataLength);
-        u32 *line = (u32*) malloc(texp->rowBytes);
-        int x, y;
-        for (y = 0; y < texp->imageHeight; y++)
-        {
-            png_read_row(png_ptr, (u8*) line, NULL);
-            for (x = 0; x < texp->imageWidth; x++)
-            {
-                u32 color = line[x];
-                texp->data[x + y * texp->textureWidth] =  color;
-            }
-        }
-
-        free(line);
+		rowPointers = (png_bytep *)malloc(sizeof(png_bytep) * texp->textureHeight);
+		
+		for(i = 0; i < texp->textureHeight; i++)
+			rowPointers[i] = (png_bytep)(texp->data + i * texp->rowBytes);
+			
+		png_read_image(png_ptr, rowPointers);
 
         png_read_end(png_ptr, NULL);
         png_destroy_read_struct(&png_ptr, NULL, NULL);

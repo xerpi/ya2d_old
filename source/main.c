@@ -29,21 +29,23 @@ int main(int argc, char *argv[])
 	ya2d_init();
 
 	ya2d_Texture tex;
-	if(!ya2d_loadPNGfromFile("ms0:/test.png", &tex))
+	if(!ya2d_loadPNGfromFile("ms0:/test2.png", &tex))
 	{
-		ya2d_error("Error loading ms0:/test.png");
+		ya2d_error("Error loading ms0:/test2.png");
 	}
 
 	while(1)
 	{   
         ya2d_clearScreen(0);
 		//printf("FPS: %f   frame: %i diffTime: %lu", fps, frame_count, diffTime);
-		printf("image width: %i\n", tex.imageWidth);
+		printf("image width: %i  alpha: %s\n", tex.imageWidth, tex.hasAlpha ? "true" : "false");
 
 		ya2d_drawFillRect(10, 10, 50, 20, GU_RGB(255,0,0));
 		ya2d_drawRect(109, 140, 20, 80, GU_RGB(0,0,255));
 
-		ya2d_drawTexture(&tex, 50, 10);
+
+		ya2d_drawTexture(&tex, 20, 10);
+		ya2d_drawTexture(&tex, 200, 10);
 
 		ya2d_flipScreen();
 		ya2d_updateConsole();
