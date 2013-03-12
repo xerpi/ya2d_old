@@ -88,11 +88,11 @@
 			sceGumLoadIdentity();
 	}
 	
-    void ya2d_clearScreen()
+    void ya2d_clearScreen(unsigned int color)
     {
         sceGuStart(GU_DIRECT, ya2d_guList);
-        sceGuClearColor(0);
-        sceGuClearDepth(0);
+        sceGuClearColor(color);
+        sceGuClearDepth(color);
         sceGuClear(GU_COLOR_BUFFER_BIT|GU_DEPTH_BUFFER_BIT);
 		ya2d_setupProjection();
     }
@@ -128,7 +128,7 @@
         sceKernelDcacheWritebackRange(vertices, 5 * sizeof(ya2d_FastVertex));
     }
 
-    void ya2d_drawFillRect(int x, int y, int h, int w, u32 color)
+    void ya2d_drawFillRect(int x, int y, int w, int h, u32 color)
     {
 		sceGuDisable(GU_TEXTURE_2D);
         ya2d_FastVertex *vertices = (ya2d_FastVertex *)sceGuGetMemory(4 * sizeof(ya2d_FastVertex));
@@ -288,3 +288,18 @@
 
         sceKernelDcacheWritebackRange(vertices, 2 * sizeof(ya2d_TextureVertex));
     }
+
+    void ya2d_error(char *error_txt)
+    {
+		ya2d_clearScreen(GU_RGB(0, 50, 255)); //BSoD
+		printf(error_txt);
+		printf("   -   Press HOME to exit.");
+		ya2d_flipScreen();
+		ya2d_updateConsole();
+		while(1)
+		{
+			sceKernelDelayThread(1000);
+		}
+	}
+
+

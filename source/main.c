@@ -14,19 +14,6 @@
 PSP_MODULE_INFO("ya2d", PSP_MODULE_USER, 1, 1);
 PSP_HEAP_SIZE_MAX();
 
-
-#define GU_RGB(r,g,b) GU_RGBA(r,g,b,255)
-
-#define printf pspDebugScreenPrintf
-
-
-typedef struct
-{
-	unsigned int color;
-	short x, y, z;
-}FSVertex;
-
-
 void initFPS();
 void FPS(float *fps_p);
 
@@ -42,15 +29,16 @@ int main(int argc, char *argv[])
 	ya2d_init();
 
 	ya2d_Texture tex;
-	int loaded = 0;
-	loaded = ya2d_loadPNGfromFile("ms0:/test.png", &tex);
+	if(!ya2d_loadPNGfromFile("ms0:/test.png", &tex))
+	{
+		ya2d_error("Error loading ms0:/test.png");
+	}
 
 	while(1)
-	{
-        ya2d_clearScreen();
-
+	{   
+        ya2d_clearScreen(0);
 		//printf("FPS: %f   frame: %i diffTime: %lu", fps, frame_count, diffTime);
-		printf("hola %i\n", tex.imageWidth);
+		printf("image width: %i\n", tex.imageWidth);
 
 		ya2d_drawFillRect(10, 10, 50, 20, GU_RGB(255,0,0));
 		ya2d_drawRect(109, 140, 20, 80, GU_RGB(0,0,255));
