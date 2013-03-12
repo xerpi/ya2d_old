@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
 	ya2d_init();
 
 	ya2d_Texture tex1, tex2;
+	
 	if(!ya2d_loadPNGfromFile("ms0:/test.png", &tex1)) //non base 2 size
 		ya2d_error("Error loading ms0:/test.png");
 		
