@@ -72,4 +72,8 @@ void _ya2d_png_read_fn(png_structp png_ptr, png_bytep buffer, uint32_t bytesToRe
 void ya2d_error(char *error_txt);
 
 
+unsigned int next_pow2(unsigned int x); //http://locklessinc.com/articles/next_pow2/
+
+
+
 #endif

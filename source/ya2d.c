@@ -177,9 +177,6 @@
         png_read_info(png_ptr, info_ptr);
         png_get_IHDR(png_ptr, info_ptr, &texp->imageWidth, &texp->imageHeight, &texp->bitDepth, &texp->colorType, NULL, NULL, NULL);
 
-        texp->textureWidth  = (texp->imageWidth);
-        texp->textureHeight = (texp->imageHeight);
-
         if(texp->bitDepth == 16)
         {
             png_set_strip_16(png_ptr);
@@ -216,13 +213,21 @@
         png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
         png_read_update_info (png_ptr, info_ptr);
 
-        texp->rowBytes = png_get_rowbytes(png_ptr, info_ptr);
-        texp->dataLength = texp->rowBytes * texp->textureHeight;
-        texp->data = (uint8_t *)memalign(16, texp->dataLength * 4);
+        /* */
 
-		rowPointers = (png_bytep *)malloc(sizeof(png_bytep) * texp->textureHeight);
+		texp->textureWidth  = next_pow2(texp->imageWidth);
+		texp->textureHeight = next_pow2(texp->imageHeight);
+
+		texp->centerX = (int)(texp->imageWidth/2);
+		texp->centerY = (int)(texp->imageHeight/2);
+
+        texp->rowBytes = texp->textureWidth * 4; //only if pow2 -> png_get_rowbytes(png_ptr, info_ptr);
+        texp->dataLength = texp->rowBytes * texp->textureHeight;
+        texp->data = (uint8_t *)memalign(16, texp->dataLength);
+
+		rowPointers = (png_bytep *)malloc(sizeof(png_bytep) * texp->imageHeight);
 		
-		for(i = 0; i < texp->textureHeight; i++)
+		for(i = 0; i < texp->imageHeight; i++)
 			rowPointers[i] = (png_bytep)(texp->data + i * texp->rowBytes);
 			
 		png_read_image(png_ptr, rowPointers);
@@ -276,7 +281,7 @@
         ya2d_TextureVertex *vertices = (ya2d_TextureVertex *)sceGuGetMemory(2 * sizeof(ya2d_TextureVertex));
 
         vertices[0] = (ya2d_TextureVertex){0, 0, x, y};
-        vertices[1] = (ya2d_TextureVertex){texp->imageWidth, texp->imageHeight, x+texp->imageWidth, y+texp->imageHeight};
+        vertices[1] = (ya2d_TextureVertex){texp->textureWidth, texp->textureHeight, x+texp->textureWidth, y+texp->textureHeight};
 
         sceGumDrawArray(GU_SPRITES, GU_TEXTURE_16BIT|GU_VERTEX_16BIT|GU_TRANSFORM_2D, 2, 0, vertices);
 
@@ -296,4 +301,16 @@
 		}
 	}
 
+
+	unsigned int next_pow2(unsigned int x) //http://locklessinc.com/articles/next_pow2/
+	{
+		x -= 1;
+		x |= (x >> 1);
+		x |= (x >> 2);
+		x |= (x >> 4);
+		x |= (x >> 8);
+		x |= (x >> 16);
+		
+		return x + 1;
+	}
 

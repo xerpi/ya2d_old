@@ -28,30 +28,30 @@ int main(int argc, char *argv[])
 	SetupCallbacks();
 	ya2d_init();
 
-	ya2d_Texture tex;
-	if(!ya2d_loadPNGfromFile("ms0:/test2.png", &tex))
-	{
+	ya2d_Texture tex1, tex2;
+	if(!ya2d_loadPNGfromFile("ms0:/test.png", &tex1)) //non base 2 size
+		ya2d_error("Error loading ms0:/test.png");
+		
+	if(!ya2d_loadPNGfromFile("ms0:/test2.png", &tex2))
 		ya2d_error("Error loading ms0:/test2.png");
-	}
 
 	while(1)
 	{   
-        ya2d_clearScreen(0);
-		//printf("FPS: %f   frame: %i diffTime: %lu", fps, frame_count, diffTime);
-		printf("image width: %i  alpha: %s\n", tex.imageWidth, tex.hasAlpha ? "true" : "false");
+        ya2d_clearScreen(0xFFFFFFFF); //white
+		printf("real W: %i  real H: %i  tex W: %i  tex H: %i", tex1.imageWidth, tex1.imageHeight, tex1.textureWidth, tex1.textureHeight);
 
 		ya2d_drawFillRect(10, 10, 50, 20, GU_RGB(255,0,0));
 		ya2d_drawRect(109, 140, 20, 80, GU_RGB(0,0,255));
 
 
-		ya2d_drawTexture(&tex, 20, 10);
-		ya2d_drawTexture(&tex, 200, 10);
+		ya2d_drawTexture(&tex1, 20, 10);
+		ya2d_drawTexture(&tex2, 200, 10);
 
 		ya2d_flipScreen();
 		ya2d_updateConsole();
-		//FPS(&fps);
 	}
-    ya2d_freeTexture(&tex);
+    ya2d_freeTexture(&tex1);
+    ya2d_freeTexture(&tex2);
 	ya2d_deinit();
 	sceKernelExitGame();
 	return 0;
