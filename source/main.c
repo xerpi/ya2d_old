@@ -8,105 +8,53 @@
 #include <stdlib.h>
 #include <time.h>
 #include "ya2d.h"
+#include "utils.h"
 
-#define millis() (clock()/1000)
+u32 frames;
+u64 current_millis, last_millis, delta_millis;
 
 PSP_MODULE_INFO("ya2d", PSP_MODULE_USER, 1, 1);
 PSP_HEAP_SIZE_MAX();
-
-void initFPS();
-void FPS(float *fps_p);
-
-void drawRectangle(short x, short y, short w, short h, unsigned int color);
-
-int exit_callback(int arg1, int arg2, void *common);
-int CallbackThread(SceSize args, void *argp);
-int SetupCallbacks(void);
 
 int main(int argc, char *argv[])
 {
 	SetupCallbacks();
 	ya2d_init();
+	initFPS();
 
-	ya2d_Texture tex1, tex2;
+	ya2d_Texture tex1, tex2, tex3;
 	
 	if(!ya2d_loadPNGfromFile("ms0:/test.png", &tex1)) //non base 2 size
 		ya2d_error("Error loading ms0:/test.png");
-		
 	if(!ya2d_loadPNGfromFile("ms0:/test2.png", &tex2))
 		ya2d_error("Error loading ms0:/test2.png");
-
+	if(!ya2d_loadPNGfromFile("ms0:/test3.png", &tex3))
+		ya2d_error("Error loading ms0:/test3.png");
+		
+	float angle = 0.0f, fps = 0.0f;
 	while(1)
 	{   
         ya2d_clearScreen(0xFFFFFFFF); //white
-		printf("real W: %i  real H: %i  tex W: %i  tex H: %i", tex1.imageWidth, tex1.imageHeight, tex1.textureWidth, tex1.textureHeight);
+		printf("FPS: %f   angle: %f\n", fps, angle);
+		printf("frames: %2i, current: %llu, last: %llu  delta: %llu", frames, current_millis, last_millis, delta_millis);
 
-		ya2d_drawFillRect(10, 10, 50, 20, GU_RGB(255,0,0));
+		ya2d_drawFillRect(40, 140, 50, 20, GU_RGB(255,0,0));
 		ya2d_drawRect(109, 140, 20, 80, GU_RGB(0,0,255));
 
+		//ya2d_drawRotateTexture(&tex3, 50, 60, angle);
+		ya2d_drawTexture(&tex2, 150, 10);
+		//ya2d_drawRotateTexture(&tex1, 240, 60, angle+3.0f);	
 
-		ya2d_drawTexture(&tex1, 20, 10);
-		ya2d_drawTexture(&tex2, 200, 10);
-
+		angle += 0.15f;
 		ya2d_flipScreen();
 		ya2d_updateConsole();
+		FPS(&fps);
 	}
     ya2d_freeTexture(&tex1);
     ya2d_freeTexture(&tex2);
+    ya2d_freeTexture(&tex3);
 	ya2d_deinit();
 	sceKernelExitGame();
 	return 0;
 }
 
-
-
-/*
-void initFPS()
-{
-	currentTime = millis();
-	lastTime = currentTime;
-	frame_count = 0;
-}
-
-void FPS(float *fps_p)
-{
-	frame_count++;
-	currentTime = millis();
-	diffTime = https://github.com/xerpi/Kamera
-	if(diffTime >= 1000)
-	{
-		*fps_p = (float)frame_count/(diffTime/1000.0f);
-		frame_count = 0;
-		lastTime = millis();
-	}
-}
-*/
-
-/*callbacks*/
-
-int exit_callback(int arg1, int arg2, void *common)
-{
-	sceKernelExitGame();
-	return 0;
-}
-
-int CallbackThread(SceSize args, void *argp)
-{
-	int cbid;
-	cbid = sceKernelCreateCallback("exit_callback", exit_callback, NULL);
-	sceKernelRegisterExitCallback(cbid);
-	sceKernelSleepThreadCB();
-	return 0;
-}
-
-int SetupCallbacks(void)
-{
-	int thid = 0;
-	thid = sceKernelCreateThread("callback_update_thread", CallbackThread, 0x11, 0xFA0, 0, 0);
-	if(thid >= 0)
-	{
-		sceKernelStartThread(thid, 0, 0);
-	}
-
-	return thid;
-}

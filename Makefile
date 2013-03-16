@@ -3,7 +3,6 @@ TARGET = ya2d
 INCLUDES = include
 SOURCES = source
 
-
 PSP_FW_VERSION = 600
 
 CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
@@ -16,7 +15,7 @@ OBJS = $(addprefix source/, $(CPPFILES:.cpp=.o) $(CFILES:.c=.o) \
 
 LIBDIR =
 LDFLAGS =
-LIBS= -lpng -lz -lm -lpspgum -lvram -lpspgu
+LIBS= -lpng -lz -lpspgum -lvram -lpspgu -lm -lpsprtc
 
 CFLAGS = -O2 -G0 -Wall -I$(INCLUDES)
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
