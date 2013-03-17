@@ -1,7 +1,16 @@
 #include "ya2d_texture.h"
 
-  int ya2d_loadPNGfromFile(char *filename, ya2d_Texture *texp)
-    {
+//Simple draw
+	//Non swizzled
+		//GU_SPRITES: 28.54 FPS
+		//GU_TRIANGLE_STRIP: 37.36 FPS
+	//Swizzled
+		//GU_SPRITES: 89.91 FPS
+		//GU_TRIANGLE_STRIP: 110.34 FPS
+
+				
+	int ya2d_loadPNGfromFile(char *filename, ya2d_Texture *texp)
+	{
         uint8_t      header[YA2D_PNG_SIG_LEN];
         png_structp  png_ptr  = NULL;
         png_infop    info_ptr = NULL;
@@ -80,24 +89,22 @@
 
         texp->rowBytes = texp->textureWidth * 4; //only if pow2 -> png_get_rowbytes(png_ptr, info_ptr);
         texp->dataLength = texp->rowBytes * texp->textureHeight;
+        
         texp->data = (uint8_t *)memalign(16, texp->dataLength);
-        uint8_t *d = (uint8_t *)memalign(16, texp->dataLength);
+        //texp->data = (uint8_t *)valloc(texp->dataLength);
         memset(texp->data, 0x0, texp->dataLength);
-		memset(d, 0x0, texp->dataLength);
+        
 		rowPointers = (png_bytep *)malloc(sizeof(png_bytep) * texp->imageHeight);
 		
 		for(i = 0; i < texp->imageHeight; i++)
-			rowPointers[i] = (png_bytep)(d + i * texp->rowBytes);
+			rowPointers[i] = (png_bytep)(texp->data + i * texp->rowBytes);
 			
 		png_read_image(png_ptr, rowPointers);
-
         png_read_end(png_ptr, NULL);
         png_destroy_read_struct(&png_ptr, NULL, NULL);
-		swizzle_fast(texp->data, d, texp->textureWidth * 4, texp->textureHeight);
-		free(d);
-        sceKernelDcacheWritebackRange(texp->data, texp->dataLength);
         free(rowPointers);
         sceIoClose(fp);
+        texp->isSwizzled = 0;
         return 1;
 
     exit_destroy:
@@ -108,6 +115,15 @@
         return 0;
     }
 
+	
+	void ya2d_swizzleTexture(ya2d_Texture *texp)
+	{
+		if(texp->isSwizzled) return;
+		uint8_t *swizzledData = (uint8_t *)memalign(16, texp->dataLength);
+		swizzle_fast(swizzledData, texp->data, texp->textureWidth, texp->textureHeight);
+		memcpy(texp->data, swizzledData, texp->dataLength);
+		texp->isSwizzled = 1;
+	}
 
     void ya2d_freeTexture(ya2d_Texture *texp)
     {
@@ -132,11 +148,15 @@
     {
         if(!texp->data) return;
 
-        sceGuTexMode (GU_PSM_8888, 0,0, 1);
 		sceGuEnable(GU_TEXTURE_2D);
 		sceGumPushMatrix();
-		sceGumLoadIdentity();
-		
+		sceGumLoadIdentity();        
+
+		if(texp->isSwizzled)
+			sceGuTexMode(GU_PSM_8888, 0, 0, GU_TRUE);
+		else
+			sceGuTexMode(GU_PSM_8888, 0, 0, GU_FALSE);
+					
 		if(texp->hasAlpha)
 			sceGuTexFunc(GU_TFX_REPLACE, GU_TCC_RGBA);
 		else
@@ -144,20 +164,49 @@
 
         sceGuTexImage(0, texp->textureWidth, texp->textureHeight, texp->textureWidth, texp->data);
 
-        ya2d_FloatTextureVertex *vertices = (ya2d_FloatTextureVertex *)sceGuGetMemory(2 * sizeof(ya2d_FloatTextureVertex));
+
+        ya2d_TextureVertex *vertices = (ya2d_TextureVertex *)sceGuGetMemory(2 * sizeof(ya2d_TextureVertex));
+
+        vertices[0] = (ya2d_TextureVertex){0, 0, x, y, 0};
+        vertices[1] = (ya2d_TextureVertex){texp->textureWidth, texp->textureHeight, x+texp->textureWidth, y+texp->textureHeight, 0};
+
+        sceGumDrawArray(GU_SPRITES, GU_TEXTURE_16BIT|GU_VERTEX_16BIT|GU_TRANSFORM_2D, 2, 0, vertices);
+        
+        sceKernelDcacheWritebackRange(vertices, 2 * sizeof(ya2d_TextureVertex));
+        
+
+        /*
+        ya2d_FloatTextureVertex *vertices = (ya2d_FloatTextureVertex *)sceGuGetMemory(4 * sizeof(ya2d_FloatTextureVertex));
 
         vertices[0] = (ya2d_FloatTextureVertex){0.0f, 0.0f, x, y, 0.0f};
-        vertices[1] = (ya2d_FloatTextureVertex){1.0f, 1.0f, x+texp->textureWidth, y+texp->textureHeight, 0.0f};
+        vertices[1] = (ya2d_FloatTextureVertex){1.0f, 0.0f, x+texp->textureWidth, y, 0.0f};
+        vertices[2] = (ya2d_FloatTextureVertex){0.0f, 1.0f, x, y+texp->textureHeight, 0.0f};
+        vertices[3] = (ya2d_FloatTextureVertex){1.0f, 1.0f, x+texp->textureWidth, y+texp->textureHeight, 0.0f};
 
-        sceGumDrawArray(GU_SPRITES, GU_TEXTURE_32BITF|GU_VERTEX_32BITF|GU_TRANSFORM_3D, 2, 0, vertices);
+        sceGumDrawArray(GU_TRIANGLE_STRIP, GU_TEXTURE_32BITF|GU_VERTEX_32BITF|GU_TRANSFORM_3D, 4, 0, vertices);
+        
+        sceKernelDcacheWritebackRange(vertices, 4 * sizeof(ya2d_FloatTextureVertex));
+        */
+        
+        /*
+        ya2d_TextureVertex *vertices = (ya2d_TextureVertex *)sceGuGetMemory(4 * sizeof(ya2d_TextureVertex));
 
-        sceKernelDcacheWritebackRange(vertices, 2 * sizeof(ya2d_FloatTextureVertex));
+        vertices[0] = (ya2d_TextureVertex){0, 0, x, y, 0};
+        vertices[1] = (ya2d_TextureVertex){texp->textureWidth, 0, x+texp->textureWidth, y, 0};
+        vertices[2] = (ya2d_TextureVertex){0, texp->textureHeight, x, y+texp->textureHeight, 0};
+        vertices[3] = (ya2d_TextureVertex){texp->textureWidth, texp->textureHeight, x+texp->textureWidth, y+texp->textureHeight, 0};
+
+        sceGumDrawArray(GU_TRIANGLE_STRIP, GU_TEXTURE_16BIT|GU_VERTEX_16BIT|GU_TRANSFORM_2D, 4, 0, vertices);
+        
+        sceKernelDcacheWritebackRange(vertices, 4 * sizeof(ya2d_TextureVertex));
+        */
+        
         sceGumPopMatrix();
     }
 
 void ya2d_drawRotateTexture(ya2d_Texture *texp, int x, int y, float angle)
 {
-sceGuDisable(GU_TEXTURE_2D);
+	sceGuDisable(GU_TEXTURE_2D);
 		sceGumPushMatrix();
 		sceGumLoadIdentity();
 		ScePspFVector3 p = {(float)x, (float)y, 0.0f};

@@ -32,15 +32,16 @@ int main(int argc, char *argv[])
 		ya2d_error("Error loading ms0:/test3.png");
 		
 	float angle = 0.0f, fps = 0.0f;
+	ya2d_swizzleTexture(&tex2);
 	while(1)
 	{   
         ya2d_clearScreen(0xFFFFFFFF); //white
-		printf("FPS: %f   angle: %f\n", fps, angle);
+		printf("FPS: %.2f   angle: %f\n", fps, angle);
 		printf("frames: %2i, current: %llu, last: %llu  delta: %llu", frames, current_millis, last_millis, delta_millis);
 
 		ya2d_drawFillRect(40, 140, 50, 20, GU_RGB(255,0,0));
 		ya2d_drawRect(109, 140, 20, 80, GU_RGB(0,0,255));
-
+		
 		//ya2d_drawRotateTexture(&tex3, 50, 60, angle);
 		ya2d_drawTexture(&tex2, 150, 10);
 		//ya2d_drawRotateTexture(&tex1, 240, 60, angle+3.0f);	

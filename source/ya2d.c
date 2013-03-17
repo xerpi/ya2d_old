@@ -101,7 +101,7 @@
     {
         sceGuFinish();
         sceGuSync(0,0);
-        sceDisplayWaitVblankStart();
+       // sceDisplayWaitVblankStart();
         ya2d_fbp0 = sceGuSwapBuffers();
         
     }
