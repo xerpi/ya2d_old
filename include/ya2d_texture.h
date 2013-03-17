@@ -5,6 +5,7 @@
 #include <pspgu.h>
 #include <pspgum.h>
 #include <vram.h>
+#include <vram_static.h>
 #include <png.h>
 #include <pspdisplay.h>
 #include <pspctrl.h>

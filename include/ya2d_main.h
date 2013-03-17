@@ -7,7 +7,7 @@
 #include <pspdebug.h>
 #include <pspgu.h>
 #include <pspgum.h>
-#include <vram.h>
+#include <vram_static.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>

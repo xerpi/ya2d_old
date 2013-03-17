@@ -133,6 +133,7 @@
 		uint8_t *swizzledData = (uint8_t *)memalign(16, texp->dataLength);
 		swizzle_fast(swizzledData, texp->data, texp->textureWidth * 4, texp->textureHeight);
 		memcpy(texp->data, swizzledData, texp->dataLength);
+		free(swizzledData);
 		texp->isSwizzled = 1;
 	}
 

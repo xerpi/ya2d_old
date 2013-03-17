@@ -15,7 +15,7 @@ OBJS = $(addprefix source/, $(CPPFILES:.cpp=.o) $(CFILES:.c=.o) \
 
 LIBDIR =
 LDFLAGS =
-LIBS= -lpng -lz -lpspgum -lvram -lpspgu -lm -lpsprtc
+LIBS= -lpng -lz -lpspgum -lpspvram -lvram_static -lpspgu -lm -lpsprtc
 
 CFLAGS = -O2 -G0 -Wall -I$(INCLUDES)
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
