@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 		ya2d_error("Error loading ms0:/test3.png");
 		
 	float angle = 0.0f, fps = 0.0f;
-	ya2d_swizzleTexture(&tex2);
+	ya2d_swizzleTexture(&tex3);
 	while(1)
 	{   
         ya2d_clearScreen(0xFFFFFFFF); //white
@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 		ya2d_drawRect(109, 140, 20, 80, GU_RGB(0,0,255));
 		
 		//ya2d_drawRotateTexture(&tex3, 50, 60, angle);
-		ya2d_drawTexture(&tex2, 150, 10);
+		ya2d_drawTextureFast(&tex3, 150, 10);
 		//ya2d_drawRotateTexture(&tex1, 240, 60, angle+3.0f);	
 
 		angle += 0.15f;

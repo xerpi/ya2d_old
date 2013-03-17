@@ -7,6 +7,13 @@
 	//Swizzled
 		//GU_SPRITES: 89.91 FPS
 		//GU_TRIANGLE_STRIP: 110.34 FPS
+//Fast draw
+	//Non swizzled
+		//GU_SPRITES: 148.26 FPS
+		//GU_TRIANGLE_STRIP: 142.57 FPS
+	//Swizzled
+		//GU_SPRITES: 264.74 FPS
+		//GU_TRIANGLE_STRIP: 263.21 FPS
 
 				
 	int ya2d_loadPNGfromFile(char *filename, ya2d_Texture *texp)
@@ -76,7 +83,11 @@
                 texp->hasAlpha = 0;
                 break;
         }
-        png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
+		if(!texp->hasAlpha) //PSP only supports 16 or 32 bits pixels (not 0xRRGGBB)
+		{
+			png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
+			texp->hasAlpha = 1;
+		}
         png_read_update_info (png_ptr, info_ptr);
 
         /* */
@@ -120,7 +131,7 @@
 	{
 		if(texp->isSwizzled) return;
 		uint8_t *swizzledData = (uint8_t *)memalign(16, texp->dataLength);
-		swizzle_fast(swizzledData, texp->data, texp->textureWidth, texp->textureHeight);
+		swizzle_fast(swizzledData, texp->data, texp->textureWidth * 4, texp->textureHeight);
 		memcpy(texp->data, swizzledData, texp->dataLength);
 		texp->isSwizzled = 1;
 	}
@@ -164,7 +175,7 @@
 
         sceGuTexImage(0, texp->textureWidth, texp->textureHeight, texp->textureWidth, texp->data);
 
-
+		/*
         ya2d_TextureVertex *vertices = (ya2d_TextureVertex *)sceGuGetMemory(2 * sizeof(ya2d_TextureVertex));
 
         vertices[0] = (ya2d_TextureVertex){0, 0, x, y, 0};
@@ -173,7 +184,7 @@
         sceGumDrawArray(GU_SPRITES, GU_TEXTURE_16BIT|GU_VERTEX_16BIT|GU_TRANSFORM_2D, 2, 0, vertices);
         
         sceKernelDcacheWritebackRange(vertices, 2 * sizeof(ya2d_TextureVertex));
-        
+        */
 
         /*
         ya2d_FloatTextureVertex *vertices = (ya2d_FloatTextureVertex *)sceGuGetMemory(4 * sizeof(ya2d_FloatTextureVertex));
@@ -187,8 +198,8 @@
         
         sceKernelDcacheWritebackRange(vertices, 4 * sizeof(ya2d_FloatTextureVertex));
         */
+       
         
-        /*
         ya2d_TextureVertex *vertices = (ya2d_TextureVertex *)sceGuGetMemory(4 * sizeof(ya2d_TextureVertex));
 
         vertices[0] = (ya2d_TextureVertex){0, 0, x, y, 0};
@@ -199,10 +210,53 @@
         sceGumDrawArray(GU_TRIANGLE_STRIP, GU_TEXTURE_16BIT|GU_VERTEX_16BIT|GU_TRANSFORM_2D, 4, 0, vertices);
         
         sceKernelDcacheWritebackRange(vertices, 4 * sizeof(ya2d_TextureVertex));
-        */
         
         sceGumPopMatrix();
     }
+
+    void ya2d_drawTextureFast(ya2d_Texture *texp, int x, int y)
+    {
+		if(texp->textureWidth <= YA2D_TEXTURE_SLICE) ya2d_drawTexture(texp, x, y);
+        if(!texp->data) return;
+
+		sceGuEnable(GU_TEXTURE_2D);
+		sceGumPushMatrix();
+		sceGumLoadIdentity();        
+
+		if(texp->isSwizzled)
+			sceGuTexMode(GU_PSM_8888, 0, 0, GU_TRUE);
+		else
+			sceGuTexMode(GU_PSM_8888, 0, 0, GU_FALSE);
+					
+		if(texp->hasAlpha)
+			sceGuTexFunc(GU_TFX_REPLACE, GU_TCC_RGBA);
+		else
+			sceGuTexFunc(GU_TFX_REPLACE, GU_TCC_RGB);
+
+        sceGuTexImage(0, texp->textureWidth, texp->textureHeight, texp->textureWidth, texp->data);
+        
+		int i;
+		for(i = 0; i < texp->textureWidth; i+= YA2D_TEXTURE_SLICE)
+		{
+			/*
+			ya2d_TextureVertex *vertices = (ya2d_TextureVertex *)sceGuGetMemory(4 * sizeof(ya2d_TextureVertex));
+			vertices[0] = (ya2d_TextureVertex){i, 0, x+i, y, 0};
+			vertices[1] = (ya2d_TextureVertex){i+YA2D_TEXTURE_SLICE, 0, x+i+YA2D_TEXTURE_SLICE, y, 0};
+			vertices[2] = (ya2d_TextureVertex){i, texp->textureHeight, x+i, y+texp->textureHeight, 0};
+			vertices[3] = (ya2d_TextureVertex){i+YA2D_TEXTURE_SLICE, texp->textureHeight, x+i+YA2D_TEXTURE_SLICE, y+texp->textureHeight, 0};
+			sceGumDrawArray(GU_TRIANGLE_STRIP, GU_TEXTURE_16BIT|GU_VERTEX_16BIT|GU_TRANSFORM_2D, 4, 0, vertices);
+			sceKernelDcacheWritebackRange(vertices, 4 * sizeof(ya2d_TextureVertex));
+			*/
+			
+			ya2d_TextureVertex *vertices = (ya2d_TextureVertex *)sceGuGetMemory(2 * sizeof(ya2d_TextureVertex));
+			vertices[0] = (ya2d_TextureVertex){i, 0, x+i, y, 0};
+			vertices[1] = (ya2d_TextureVertex){i+YA2D_TEXTURE_SLICE, texp->textureHeight, x+i+YA2D_TEXTURE_SLICE, y+texp->textureHeight, 0};
+			sceGumDrawArray(GU_SPRITES, GU_TEXTURE_16BIT|GU_VERTEX_16BIT|GU_TRANSFORM_2D, 2, 0, vertices);
+			sceKernelDcacheWritebackRange(vertices, 2 * sizeof(ya2d_TextureVertex));
+		}
+			   
+		sceGumPopMatrix();
+	}
 
 void ya2d_drawRotateTexture(ya2d_Texture *texp, int x, int y, float angle)
 {
