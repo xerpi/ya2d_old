@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 	ya2d_init();
 	initFPS();
 
-	ya2d_Texture tex1, tex2, tex3;
+	ya2d_Texture tex1, tex2, tex3, bmp;
 	
 	if(!ya2d_loadPNGfromFile("ms0:/test.png", &tex1)) //non base 2 size
 		ya2d_error("Error loading ms0:/test.png");
@@ -30,6 +30,9 @@ int main(int argc, char *argv[])
 		ya2d_error("Error loading ms0:/test2.png");
 	if(!ya2d_loadPNGfromFile("ms0:/test3.png", &tex3))
 		ya2d_error("Error loading ms0:/test3.png");
+
+	if(!ya2d_loadBMPfromFile("ms0:/bmptest.bmp", &bmp))
+		ya2d_error("Error loading ms0:/bmptest.bmp");
 		
 	float angle = 0.0f, fps = 0.0f;
 	ya2d_swizzleTexture(&tex3);

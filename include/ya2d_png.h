@@ -2,6 +2,7 @@
 #define _YA2D_PNG_H_
 
 #include <pspsdk.h>
+#include <pspsdk.h>
 #include <malloc.h>
 #include "ya2d_texture.h"
 

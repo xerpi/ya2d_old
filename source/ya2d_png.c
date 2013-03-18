@@ -112,8 +112,7 @@
     }
 
 
-
-    void _ya2d_png_read_fn(png_structp png_ptr, png_bytep buffer, uint32_t bytesToRead)
+	void _ya2d_png_read_fn(png_structp png_ptr, png_bytep buffer, uint32_t bytesToRead)
     {
         SceUID *fp = (SceUID *)png_get_io_ptr(png_ptr);
         if(fp == NULL)
