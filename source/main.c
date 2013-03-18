@@ -57,6 +57,7 @@ int main(int argc, char *argv[])
     ya2d_freeTexture(&tex1);
     ya2d_freeTexture(&tex2);
     ya2d_freeTexture(&tex3);
+    ya2d_freeTexture(&bmp);
 	ya2d_deinit();
 	sceKernelExitGame();
 	return 0;
