@@ -54,12 +54,10 @@ typedef struct
 	uint8_t hasAlpha, isSwizzled;
 }ya2d_Texture;
 
-int ya2d_loadPNGfromFile(char *filename, ya2d_Texture *texp);
 void ya2d_swizzleTexture(ya2d_Texture *texp);
 void ya2d_drawTexture(ya2d_Texture *texp, int x, int y);
 void ya2d_drawTextureFast(ya2d_Texture *texp, int x, int y);
 void ya2d_drawRotateTexture(ya2d_Texture *texp, int x, int y, float angle);
 void ya2d_freeTexture(ya2d_Texture *texp);
-void _ya2d_png_read_fn(png_structp png_ptr, png_bytep buffer, uint32_t bytesToRead);
 
 #endif
