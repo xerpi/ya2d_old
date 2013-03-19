@@ -13,6 +13,7 @@
 #include <time.h>
 #include <malloc.h>
 #include <math.h>
+#include <stdarg.h>
 
 #include "ya2d_globals.h"
 
@@ -24,8 +25,7 @@ void ya2d_clearScreen(unsigned int color);
 void ya2d_flipScreen();
 void ya2d_updateConsole();
 void ya2d_setupProjection();
-
-void ya2d_error(char *error_txt);
+void ya2d_error(char *t, ...);
 
 
 #endif

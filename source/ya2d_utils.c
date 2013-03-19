@@ -35,21 +35,6 @@
 		}
 	}
 
-
-    void ya2d_error(char *error_txt)
-    {
-		ya2d_clearScreen(GU_RGB(0, 50, 255)); //BSoD
-		printf(error_txt);
-		printf("   -   Press HOME to exit.");
-		ya2d_flipScreen();
-		ya2d_updateConsole();
-		while(1)
-		{
-			sceKernelDelayThread(1000);
-		}
-	}
-
-
 	unsigned int next_pow2(unsigned int x) //from http://locklessinc.com/articles/next_pow2/
 	{
 		x -= 1;

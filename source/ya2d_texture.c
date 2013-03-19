@@ -44,9 +44,9 @@
 		sceGumLoadIdentity();        
 
 		if(texp->isSwizzled)
-			sceGuTexMode(GU_PSM_8888, 0, 0, GU_TRUE);
+			sceGuTexMode(texp->texPSM, 0, 0, GU_TRUE);
 		else
-			sceGuTexMode(GU_PSM_8888, 0, 0, GU_FALSE);
+			sceGuTexMode(texp->texPSM, 0, 0, GU_FALSE);
 					
 		if(texp->hasAlpha)
 			sceGuTexFunc(GU_TFX_REPLACE, GU_TCC_RGBA);
@@ -104,9 +104,9 @@
 		sceGumLoadIdentity();        
 
 		if(texp->isSwizzled)
-			sceGuTexMode(GU_PSM_8888, 0, 0, GU_TRUE);
+			sceGuTexMode(texp->texPSM, 0, 0, GU_TRUE);
 		else
-			sceGuTexMode(GU_PSM_8888, 0, 0, GU_FALSE);
+			sceGuTexMode(texp->texPSM, 0, 0, GU_FALSE);
 					
 		if(texp->hasAlpha)
 			sceGuTexFunc(GU_TFX_REPLACE, GU_TCC_RGBA);
@@ -140,7 +140,7 @@
 
 void ya2d_drawRotateTexture(ya2d_Texture *texp, int x, int y, float angle)
 {
-	sceGuDisable(GU_TEXTURE_2D);
+	/*sceGuDisable(GU_TEXTURE_2D);
 		sceGumPushMatrix();
 		sceGumLoadIdentity();
 		ScePspFVector3 p = {(float)x, (float)y, 0.0f};
@@ -165,6 +165,7 @@ void ya2d_drawRotateTexture(ya2d_Texture *texp, int x, int y, float angle)
         
         sceGumDrawArray(GU_TRIANGLES,GU_COLOR_8888|GU_VERTEX_32BITF|GU_TRANSFORM_3D,3,0,vert);
 
-		sceGumPopMatrix();		
+		sceGumPopMatrix();
+		*/
 
 }

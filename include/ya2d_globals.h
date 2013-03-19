@@ -9,6 +9,8 @@
 	#define printf pspDebugScreenPrintf
 #endif
 
+#define YA2D_ERROR_BUFSIZE 256
+
 #define YA2D_BUF_WIDTH  512
 #define YA2D_SCR_WIDTH  480
 #define YA2D_SCR_HEIGHT 272

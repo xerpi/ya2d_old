@@ -6,14 +6,14 @@
         uint8_t      header[YA2D_PNG_SIG_LEN];
         png_structp  png_ptr  = NULL;
         png_infop    info_ptr = NULL;
-        SceUID       fp;
+        FILE         *fp;
         png_bytep *rowPointers;
 		int i;
 
-        if(!(fp = sceIoOpen(filename, PSP_O_RDONLY, 0777)))
+        if(!(fp = fopen(filename, "rb")))
             goto exit_error;
 
-        sceIoRead(fp, header, YA2D_PNG_SIG_LEN);
+        fread(header, 1, YA2D_PNG_SIG_LEN, fp);
         if (png_sig_cmp((png_bytep)header, 0, YA2D_PNG_SIG_LEN))
             goto exit_close;
 
@@ -30,7 +30,8 @@
 
         //ya2d_freeTexture(texp);
 
-        png_set_read_fn(png_ptr, (void *)&fp, (png_rw_ptr)_ya2d_png_read_fn);
+        //png_set_read_fn(png_ptr, (void *)&fd, (png_rw_ptr)_ya2d_png_read_fn);
+        png_init_io(png_ptr, fp);
         png_set_sig_bytes(png_ptr, YA2D_PNG_SIG_LEN);
         png_read_info(png_ptr, info_ptr);
         png_get_IHDR(png_ptr, info_ptr, &texp->imageWidth, &texp->imageHeight, &texp->bitDepth, &texp->colorType, NULL, NULL, NULL);
@@ -77,6 +78,8 @@
 
         /* */
 
+        texp->texPSM = GU_PSM_8888;
+
 		texp->textureWidth  = next_pow2(texp->imageWidth);
 		texp->textureHeight = next_pow2(texp->imageHeight);
 
@@ -99,14 +102,14 @@
         png_read_end(png_ptr, NULL);
         png_destroy_read_struct(&png_ptr, NULL, NULL);
         free(rowPointers);
-        sceIoClose(fp);
+        fclose(fp);
         texp->isSwizzled = 0;
         return 1;
 
     exit_destroy:
         png_destroy_read_struct(&png_ptr, NULL, NULL);
     exit_close:
-        sceIoClose(fp);
+        fclose(fp);
     exit_error:
         return 0;
     }
@@ -114,10 +117,10 @@
 
 	void _ya2d_png_read_fn(png_structp png_ptr, png_bytep buffer, uint32_t bytesToRead)
     {
-        SceUID *fp = (SceUID *)png_get_io_ptr(png_ptr);
-        if(fp == NULL)
+        SceUID *fd = (SceUID *)png_get_io_ptr(png_ptr);
+        if(fd == NULL)
             return;
-        uint32_t bytesReaded = sceIoRead((SceUID)*fp, (void*)buffer, bytesToRead);
+        uint32_t bytesReaded = sceIoRead((SceUID)*fd, (void*)buffer, bytesToRead);
         if(bytesReaded != bytesToRead)
             return;
     }

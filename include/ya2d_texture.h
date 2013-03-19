@@ -49,8 +49,8 @@ typedef struct
 	uint32_t textureWidth, textureHeight;
 	uint32_t centerX, centerY;
     uint32_t rowBytes, dataLength;
-	uint8_t __attribute__((aligned(16))) *data;
-	int bitDepth, colorType;
+	uint8_t  *data;
+	int bitDepth, colorType, texPSM;
 	uint8_t hasAlpha, isSwizzled;
 }ya2d_Texture;
 

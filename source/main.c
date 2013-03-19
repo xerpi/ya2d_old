@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 	ya2d_init();
 	initFPS();
 
-	ya2d_Texture tex1, tex2, tex3, bmp;
+	ya2d_Texture tex1, tex2, tex3, jpeg;
 	
 	if(!ya2d_loadPNGfromFile("ms0:/test.png", &tex1)) //non base 2 size
 		ya2d_error("Error loading ms0:/test.png");
@@ -31,24 +31,29 @@ int main(int argc, char *argv[])
 	if(!ya2d_loadPNGfromFile("ms0:/test3.png", &tex3))
 		ya2d_error("Error loading ms0:/test3.png");
 
-	if(!ya2d_loadBMPfromFile("ms0:/bmptest.bmp", &bmp))
-		ya2d_error("Error loading ms0:/bmptest.bmp");
-		
+	if(!ya2d_loadJPEGfromFile("ms0:/jpegimg.jpg", &jpeg))
+		ya2d_error("Error loading ms0:/jpegimg.jpg");		
+
+
 	float angle = 0.0f, fps = 0.0f;
+	ya2d_swizzleTexture(&tex1);
+	ya2d_swizzleTexture(&tex2);
 	ya2d_swizzleTexture(&tex3);
+	ya2d_swizzleTexture(&jpeg);
 	while(1)
 	{   
         ya2d_clearScreen(0xFFFFFFFF); //white
-		printf("FPS: %.2f   angle: %f\n", fps, angle);
-		printf("frames: %2i, current: %llu, last: %llu  delta: %llu", frames, current_millis, last_millis, delta_millis);
+		printf("FPS: %.2f   angle: %f  ", fps, angle);
+		printf("frames: %2i  delta: %4llu", frames, delta_millis);
 
 		ya2d_drawFillRect(40, 140, 50, 20, GU_RGB(255,0,0));
 		ya2d_drawRect(109, 140, 20, 80, GU_RGB(0,0,255));
 		
-		//ya2d_drawRotateTexture(&tex3, 50, 60, angle);
-		ya2d_drawTextureFast(&tex3, 150, 10);
-		//ya2d_drawRotateTexture(&tex1, 240, 60, angle+3.0f);	
-
+		ya2d_drawTextureFast(&tex3, 50, 60);
+		ya2d_drawTextureFast(&tex1, 150, 10);
+		ya2d_drawTextureFast(&tex2, 240, 60);
+		ya2d_drawTextureFast(&jpeg, 20, 10);
+		
 		angle += 0.15f;
 		ya2d_flipScreen();
 		ya2d_updateConsole();
@@ -57,7 +62,7 @@ int main(int argc, char *argv[])
     ya2d_freeTexture(&tex1);
     ya2d_freeTexture(&tex2);
     ya2d_freeTexture(&tex3);
-    ya2d_freeTexture(&bmp);
+    ya2d_freeTexture(&jpeg);
 	ya2d_deinit();
 	sceKernelExitGame();
 	return 0;

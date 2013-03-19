@@ -113,4 +113,19 @@
         pspDebugScreenSetXY(0,0);
     }
 
-
+	void ya2d_error(char *t, ...)
+	{
+		va_list args;
+		va_start(args, t);
+		char buffer[YA2D_ERROR_BUFSIZE];
+		vsnprintf(buffer, YA2D_ERROR_BUFSIZE, t, args);
+		ya2d_clearScreen(GU_RGB(0, 50, 255)); //BSoD
+		printf(buffer);
+		printf("   -   Press HOME to exit.");
+		ya2d_flipScreen();
+		ya2d_updateConsole();
+		while(1)
+		{
+			sceKernelDelayThread(1000);
+		}
+	}
