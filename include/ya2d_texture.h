@@ -54,6 +54,7 @@ typedef struct
 	uint8_t hasAlpha, isSwizzled;
 }ya2d_Texture;
 
+void ya2d_createTexture(ya2d_Texture *texp, int w, int h, int psm);
 void ya2d_swizzleTexture(ya2d_Texture *texp);
 void ya2d_drawTexture(ya2d_Texture *texp, int x, int y);
 void ya2d_drawTextureFast(ya2d_Texture *texp, int x, int y);

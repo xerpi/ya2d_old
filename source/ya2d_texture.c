@@ -15,10 +15,41 @@
 		//GU_SPRITES: 264.74 FPS
 		//GU_TRIANGLE_STRIP: 263.21 FPS
 
+
+	void ya2d_createTexture(ya2d_Texture *texp, int w, int h, int psm)
+	{
+		texp->imageWidth  = w;
+		texp->imageHeight = h;
+		texp->textureWidth  = next_pow2(w);
+		texp->textureHeight = next_pow2(h);
+		texp->centerX = (int)(w/2);
+		texp->centerY = (int)(h/2);
+
+		texp->texPSM = psm;
+		texp->isSwizzled = 0;
+		texp->hasAlpha   = 1;
+		
+		switch(psm)
+		{
+		case GU_PSM_4444:
+		case GU_PSM_5650:
+		case GU_PSM_5551:
+			texp->rowBytes = texp->textureWidth * 2;
+			break;
+		default:
+		case GU_PSM_8888:
+			texp->rowBytes = texp->textureWidth * 4;
+			break;
+		}
+		
+		texp->dataLength = texp->rowBytes * texp->textureHeight;
+		texp->data = (uint8_t *)memalign(16, texp->dataLength);
+		memset(texp->data, 0, texp->dataLength);
+	}
 	
 	void ya2d_swizzleTexture(ya2d_Texture *texp)
 	{
-		if(texp->isSwizzled) return;
+		if(texp->isSwizzled || (texp->textureWidth < 33 && texp->textureHeight < 33)) return;
 		uint8_t *swizzledData = (uint8_t *)memalign(16, texp->dataLength);
 		swizzle_fast(swizzledData, texp->data, texp->textureWidth * 4, texp->textureHeight);
 		memcpy(texp->data, swizzledData, texp->dataLength);
