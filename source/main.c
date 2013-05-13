@@ -30,16 +30,14 @@ int main(int argc, char *argv[])
 		ya2d_error("Error loading ms0:/test2.png");
 	if(! (tex3 = ya2d_loadPNGfromFile("ms0:/test3.png", YA2D_VRAM)))
 		ya2d_error("Error loading ms0:/test3.png");
-
-	/*if(!ya2d_loadJPEGfromFile("ms0:/jpegimg.jpg", &jpeg))
-		ya2d_error("Error loading ms0:/jpegimg.jpg");	*/	
-
+	if(! (jpeg = ya2d_loadJPEGfromFile("ms0:/jpegimg.jpg", YA2D_VRAM)))
+		ya2d_error("Error loading ms0:/jpegimg.jpg");	
 
 	float angle = 0.0f, fps = 0.0f;
 	ya2d_swizzleTexture(tex1);
 	ya2d_swizzleTexture(tex2);
 	ya2d_swizzleTexture(tex3);
-	//ya2d_swizzleTexture(jpeg);
+	ya2d_swizzleTexture(jpeg);
 	while(1)
 	{   
         ya2d_clearScreen(0xFFFFFFFF); //white
@@ -52,7 +50,7 @@ int main(int argc, char *argv[])
 		ya2d_drawTextureFast(tex3, 50, 60);
 		ya2d_drawTextureFast(tex1, 150, 10);
 		ya2d_drawTextureFast(tex2, 240, 60);
-		//ya2d_drawTextureFast(jpeg, 20, 10);
+		ya2d_drawTextureFast(jpeg, 20, 10);
 		
 		angle += 0.15f;
 		ya2d_flipScreen();
@@ -62,7 +60,7 @@ int main(int argc, char *argv[])
     ya2d_freeTexture(tex1);
     ya2d_freeTexture(tex2);
     ya2d_freeTexture(tex3);
-    //ya2d_freeTexture(&jpeg);
+    ya2d_freeTexture(jpeg);
 	ya2d_deinit();
 	sceKernelExitGame();
 	return 0;

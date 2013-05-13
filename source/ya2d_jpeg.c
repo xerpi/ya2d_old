@@ -1,7 +1,7 @@
 #include "ya2d_jpeg.h"
 
 
-int ya2d_loadJPEGfromFile(char *filename, ya2d_Texture *texp)
+ya2d_Texture* ya2d_loadJPEGfromFile(char *filename, ya2d_Place place)
 {
 	FILE       *fp;
 	JSAMPARRAY jpegLine;
@@ -10,6 +10,7 @@ int ya2d_loadJPEGfromFile(char *filename, ya2d_Texture *texp)
 	struct jpeg_decompress_struct cinfo;
 	struct jpeg_error_mgr jerr;
 	uint32_t color;
+	ya2d_Texture *texp;
 
 	if(!(fp = fopen(filename, "rb")))
 		goto exit_error;
@@ -20,23 +21,11 @@ int ya2d_loadJPEGfromFile(char *filename, ya2d_Texture *texp)
 	jpeg_read_header(&cinfo, 1);
 
 	jpegRowBytes = cinfo.image_width * 3;
-
-	texp->imageWidth = cinfo.image_width;
-	texp->imageHeight = cinfo.image_height;
-	texp->textureWidth  = next_pow2(texp->imageWidth);
-	texp->textureHeight = next_pow2(texp->imageHeight);
-	texp->centerX = (int)(texp->imageWidth/2);
-	texp->centerY = (int)(texp->imageHeight/2);
-
-	texp->texPSM = GU_PSM_8888;
-	texp->isSwizzled = 0;
+	
+	//Create texture
+		texp = ya2d_createTexture(cinfo.image_width, cinfo.image_height, GU_PSM_8888, place);
 	texp->hasAlpha   = 1;
 	
-	texp->rowBytes   = texp->textureWidth * 4;
-	texp->dataLength = texp->rowBytes * texp->textureHeight;
-	texp->data = (uint8_t *)memalign(16, texp->dataLength);
-	memset(texp->data, 0x0, texp->dataLength);
-
 	jpegLine = (JSAMPARRAY)malloc(sizeof(JSAMPROW) * cinfo.image_height);
 	jpegLine[0] = (JSAMPROW)malloc(jpegRowBytes);
 	
@@ -60,7 +49,7 @@ int ya2d_loadJPEGfromFile(char *filename, ya2d_Texture *texp)
 	jpeg_destroy_decompress(&cinfo);
 	free(jpegLine[0]); free(jpegLine);
 	fclose(fp);
-	return 1;
+	return texp;
 exit_error:
-	return 0;
+	return NULL;
 }

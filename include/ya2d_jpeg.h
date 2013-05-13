@@ -9,7 +9,7 @@
 #include "ya2d_texture.h"
 
 
-int ya2d_loadJPEGfromFile(char *filename, ya2d_Texture *texp);
+ya2d_Texture *ya2d_loadJPEGfromFile(char *filename, ya2d_Place place);
 
 
 
