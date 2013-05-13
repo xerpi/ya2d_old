@@ -106,7 +106,7 @@
     }
 
 
-	ya2d_Texture* ya2d_loadPNGfromBuffer(void *buffer, u32 buffer_size, ya2d_Place place)
+	ya2d_Texture* ya2d_loadPNGfromBuffer(void *buffer, ya2d_Place place)
 	{
         uint8_t       header[YA2D_PNG_SIG_LEN];
         png_structp   png_ptr  = NULL;
@@ -118,7 +118,7 @@
 		int           bitDepth, colorType;
 		ya2d_Texture* texp;
 
-        if(buffer == NULL || buffer_size == 0)
+        if(buffer == NULL)
             goto exit_error;
 
         memcpy(header, buffer, YA2D_PNG_SIG_LEN);

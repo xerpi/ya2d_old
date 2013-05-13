@@ -12,16 +12,16 @@
 
 //Images
 	extern unsigned char test_png_start[];
-	extern unsigned char test_png_size;
+	extern u32 test_png_size;
 
 	extern unsigned char test2_png_start[];
-	extern unsigned char test2_png_size;
+	extern u32 test2_png_size;
 
 	extern unsigned char test3_png_start[];
-	extern unsigned char test3_png_size;
+	extern u32 test3_png_size;
 	
 	extern unsigned char jpegimg_jpg_start[];
-	extern unsigned char jpegimg_jpg_size;
+	extern u32 jpegimg_jpg_size;
 	
 
 u32 frames;
@@ -49,13 +49,13 @@ int main(int argc, char *argv[])
 		ya2d_error("Error loading ms0:/jpegimg.jpg");
 	*/
 	
-	if(! (tex1 = ya2d_loadPNGfromBuffer(test_png_start, test_png_size, YA2D_VRAM)))
+	if(! (tex1 = ya2d_loadPNGfromBuffer(test_png_start, YA2D_VRAM)))
 		ya2d_error("Error loading test.png, start: %i   size: %i", test_png_start, test_png_size);
-	if(! (tex2 = ya2d_loadPNGfromBuffer(test2_png_start, test2_png_size, YA2D_VRAM)))
+	if(! (tex2 = ya2d_loadPNGfromBuffer(test2_png_start, YA2D_VRAM)))
 		ya2d_error("Error loading test2.png");
-	if(! (tex3 = ya2d_loadPNGfromBuffer(test3_png_start, test3_png_size, YA2D_VRAM)))
+	if(! (tex3 = ya2d_loadPNGfromBuffer(test3_png_start, YA2D_VRAM)))
 		ya2d_error("Error loading test3.png");
-	if(! (jpeg = ya2d_loadJPEGfromFile("ms0:/jpegimg.jpg", YA2D_VRAM)))
+	if(! (jpeg = ya2d_loadJPEGfromBuffer(jpegimg_jpg_start, jpegimg_jpg_size, YA2D_VRAM)))
 		ya2d_error("Error loading jpegimg.jpg");
 
 	float angle = 0.0f, fps = 0.0f;

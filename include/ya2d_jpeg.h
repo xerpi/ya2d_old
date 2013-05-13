@@ -9,8 +9,8 @@
 #include "ya2d_texture.h"
 
 
-ya2d_Texture *ya2d_loadJPEGfromFile(char *filename, ya2d_Place place);
-
+ya2d_Texture* ya2d_loadJPEGfromFile(char *filename, ya2d_Place place);
+ya2d_Texture* ya2d_loadJPEGfromBuffer(void *buffer, u32 buffer_size, ya2d_Place place);
 
 
 #endif

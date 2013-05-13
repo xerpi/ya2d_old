@@ -7,7 +7,7 @@
 #include "ya2d_texture.h"
 
 ya2d_Texture* ya2d_loadPNGfromFile(char *filename, ya2d_Place place);
-ya2d_Texture* ya2d_loadPNGfromBuffer(void *buffer, u32 buffer_size, ya2d_Place place);
+ya2d_Texture* ya2d_loadPNGfromBuffer(void *buffer, ya2d_Place place);
 
 
 void _ya2d_png_read_file_fn(png_structp png_ptr, png_bytep buffer, uint32_t bytesToRead);
