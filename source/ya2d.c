@@ -10,6 +10,8 @@
         static float   ya2d_FPS = 0.0f;
     //ya2d
         static u8  ya2d_inited = 0;
+        static SceCtrlData ya2d_pad, ya2d_oldPad;
+        static u32 ya2d_ButtonsHeld = 0, ya2d_ButtonsPressed = 0, ya2d_ButtonsReleased = 0;
 
 /* Functions */
 
@@ -17,54 +19,65 @@
     int ya2d_init()
     {
         if(ya2d_inited) return 1;
+		
+		//Init GU
+			if(ya2d_fbp0 == NULL) ya2d_fbp0 = vrelptr(valloc(YA2D_BUF_WIDTH * YA2D_SCR_HEIGHT * 4));
+			if(ya2d_fbp1 == NULL) ya2d_fbp1 = vrelptr(valloc(YA2D_BUF_WIDTH * YA2D_SCR_HEIGHT * 4));
+			if(ya2d_zbp  == NULL) ya2d_zbp  = vrelptr(valloc(YA2D_BUF_WIDTH * YA2D_SCR_HEIGHT * 2));
 
-        if(ya2d_fbp0 == NULL) ya2d_fbp0 = vrelptr(valloc(YA2D_BUF_WIDTH * YA2D_SCR_HEIGHT * 4));
-        if(ya2d_fbp1 == NULL) ya2d_fbp1 = vrelptr(valloc(YA2D_BUF_WIDTH * YA2D_SCR_HEIGHT * 4));
-        if(ya2d_zbp  == NULL) ya2d_zbp  = vrelptr(valloc(YA2D_BUF_WIDTH * YA2D_SCR_HEIGHT * 2));
+			sceGuInit();
+			sceGuStart(GU_DIRECT, ya2d_guList);
+			sceGuDrawBuffer(GU_PSM_8888, ya2d_fbp0, YA2D_BUF_WIDTH);
+			sceGuDispBuffer(YA2D_SCR_WIDTH, YA2D_SCR_HEIGHT, ya2d_fbp1, YA2D_BUF_WIDTH);
+			sceGuDepthBuffer(ya2d_zbp, YA2D_BUF_WIDTH);
+			sceGuOffset(2048 - (YA2D_SCR_WIDTH/2), 2048 - (YA2D_SCR_HEIGHT/2));
+			sceGuViewport(2048, 2048, YA2D_SCR_WIDTH, YA2D_SCR_HEIGHT);
+			sceGuDepthRange(65535, 0);
+	 
+			sceGuScissor(0, 0, YA2D_SCR_WIDTH, YA2D_SCR_HEIGHT);
 
-		sceGuInit();
-        sceGuStart(GU_DIRECT, ya2d_guList);
-        sceGuDrawBuffer(GU_PSM_8888, ya2d_fbp0, YA2D_BUF_WIDTH);
-        sceGuDispBuffer(YA2D_SCR_WIDTH, YA2D_SCR_HEIGHT, ya2d_fbp1, YA2D_BUF_WIDTH);
-        sceGuDepthBuffer(ya2d_zbp, YA2D_BUF_WIDTH);
-        sceGuOffset(2048 - (YA2D_SCR_WIDTH/2), 2048 - (YA2D_SCR_HEIGHT/2));
-        sceGuViewport(2048, 2048, YA2D_SCR_WIDTH, YA2D_SCR_HEIGHT);
-        sceGuDepthRange(65535, 0);
- 
-        sceGuScissor(0, 0, YA2D_SCR_WIDTH, YA2D_SCR_HEIGHT);
+			sceGuEnable(GU_ALPHA_TEST);
+			sceGuEnable(GU_SCISSOR_TEST);
+			sceGuEnable(GU_BLEND);
+			sceGuEnable(GU_TEXTURE_2D);
 
-		sceGuEnable(GU_ALPHA_TEST);
-		sceGuEnable(GU_SCISSOR_TEST);
-		sceGuEnable(GU_BLEND);
-		sceGuEnable(GU_TEXTURE_2D);
+			sceGuFrontFace(GU_CW);
+			sceGuShadeModel(GU_SMOOTH);
 
-		sceGuFrontFace(GU_CW);
-		sceGuShadeModel(GU_SMOOTH);
-
-		sceGuAlphaFunc(GU_GREATER, 0, 255);
-        sceGuDepthFunc(GU_LEQUAL);
-        sceGuBlendFunc(GU_ADD, GU_SRC_ALPHA, GU_ONE_MINUS_SRC_ALPHA, 0, 0);		
- 
-        //setup texture
-            sceGuTexMode(GU_PSM_8888,0,0,1);
-            sceGuTexFunc(GU_TFX_DECAL, GU_TCC_RGBA);//apply as decal
-            //sceGuTexFunc(GU_TFX_MODULATE,GU_TCC_RGBA);
-            sceGuTexFilter(GU_LINEAR, GU_LINEAR);       //linear good quality
-            sceGuTexScale(1.0f,1.0f); //no scaling
-            sceGuTexOffset(0.0f,0.0f);
- 
-        //sceGuBlendFunc(GU_ADD, GU_SRC_ALPHA, GU_ONE_MINUS_SRC_ALPHA, 0, 0);
-        sceGuFinish();
- 
-        sceGuSync(0, 0);
-        sceDisplayWaitVblankStart();
-        sceGuDisplay(GU_TRUE);
-       
-        ya2d_setupProjection();
-        //Debug console
-            pspDebugScreenInit();
-            ya2d_updateConsole();
-
+			sceGuAlphaFunc(GU_GREATER, 0, 255);
+			sceGuDepthFunc(GU_LEQUAL);
+			sceGuBlendFunc(GU_ADD, GU_SRC_ALPHA, GU_ONE_MINUS_SRC_ALPHA, 0, 0);		
+	 
+			//setup texture
+				sceGuTexMode(GU_PSM_8888,0,0,1);
+				sceGuTexFunc(GU_TFX_DECAL, GU_TCC_RGBA);//apply as decal
+				//sceGuTexFunc(GU_TFX_MODULATE,GU_TCC_RGBA);
+				sceGuTexFilter(GU_LINEAR, GU_LINEAR);       //linear good quality
+				sceGuTexScale(1.0f,1.0f); //no scaling
+				sceGuTexOffset(0.0f,0.0f);
+	 
+			//sceGuBlendFunc(GU_ADD, GU_SRC_ALPHA, GU_ONE_MINUS_SRC_ALPHA, 0, 0);
+			sceGuFinish();
+	 
+			sceGuSync(0, 0);
+			sceDisplayWaitVblankStart();
+			sceGuDisplay(GU_TRUE);
+		   
+			ya2d_setupProjection();
+			//Debug console
+				pspDebugScreenInit();
+				ya2d_updateConsole();
+		
+		//Init controls
+			sceCtrlSetSamplingCycle(0);
+			sceCtrlSetSamplingMode(PSP_CTRL_MODE_ANALOG);
+			ya2d_Controls.held     = (ya2d_Buttons_t *)&ya2d_ButtonsHeld;
+			ya2d_Controls.pressed  = (ya2d_Buttons_t *)&ya2d_ButtonsPressed;
+			ya2d_Controls.released = (ya2d_Buttons_t *)&ya2d_ButtonsReleased;
+			ya2d_Controls.analogx  = &ya2d_pad.Lx;
+			ya2d_Controls.analogy  = &ya2d_pad.Ly;
+			
+			ya2d_readControls();
 
 		ya2d_currentTime = ya2d_lastTime = ya2d_millis();
         ya2d_inited = 1;
@@ -120,6 +133,15 @@
 				ya2d_lastTime = ya2d_millis();
 			}       
     }
+    
+    void ya2d_readControls()
+    {
+		sceCtrlPeekBufferPositive(&ya2d_pad, 1);
+		ya2d_ButtonsHeld     = ya2d_pad.Buttons;
+		ya2d_ButtonsPressed  = ya2d_pad.Buttons & ~ya2d_oldPad.Buttons;
+		ya2d_ButtonsReleased = ~ya2d_pad.Buttons & ya2d_oldPad.Buttons;
+		sceCtrlPeekBufferPositive(&ya2d_oldPad, 1);
+	}
     
     float ya2d_getFPS()
     {

@@ -64,9 +64,9 @@ int main(int argc, char *argv[])
 	while(1)
 	{   
         ya2d_clearScreen(0xFFFFFFFF); //white
+        ya2d_readControls();
 		printf("FPS: %.2f   angle: %f  ", ya2d_getFPS(), angle);
-		printf("vram: %.2f KB", ((float)vlargestblock()/1024));
-
+		printf("vram: %.2f KB %i", ((float)vlargestblock()/1024), *(unsigned int *)ya2d_Controls.held);
 
 		ya2d_drawRotateTexture(jpeg, 20, 10, angle);
 		ya2d_drawRotateTexture(tex1, 250, 60, angle);
@@ -74,7 +74,8 @@ int main(int argc, char *argv[])
 		ya2d_drawRotateTexture(tex3, x,y, angle);
 		ya2d_drawRect(x, y, 64,64,0xFF0000FF);
 		
-		
+		if(ya2d_Controls.held->cross) ya2d_drawFillRect(0,0,480,272,0xFF00FF00);
+			
 		angle += 0.01f;
 		ya2d_flipScreen();
 		ya2d_updateConsole();
