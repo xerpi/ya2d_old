@@ -1,29 +1,5 @@
 #include "utils.h"
 
-u32 frames;
-u64 current_millis, last_millis, delta_millis;
-
-
-void initFPS()
-{
-	current_millis = getMilliSeconds();
-	last_millis = current_millis;
-	frames = 0;
-}
-
-void FPS(float *fps_p)
-{
-	frames++;
-	current_millis = getMilliSeconds();
-	delta_millis = current_millis - last_millis;
-	if(delta_millis >= 1000)
-	{
-		*fps_p = (float)frames/((float)delta_millis/1000.0f);
-		frames = 0;
-		last_millis = getMilliSeconds();
-	}
-}
-
 
 /*callbacks*/
 

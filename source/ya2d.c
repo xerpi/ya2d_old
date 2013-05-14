@@ -5,10 +5,11 @@
         static unsigned int __attribute__((aligned(16))) ya2d_guList[262144];
         static void *ya2d_fbp0 = NULL, *ya2d_fbp1 = NULL, *ya2d_zbp = NULL;
     //Frame counting
-        static u32    ya2d_frameCount;
-        static time_t ya2d_currentTime, ya2d_lastTime, ya2d_diffTime;
+        static u32     ya2d_frameCount = 0;
+        static clock_t ya2d_currentTime = 0, ya2d_lastTime = 0, ya2d_deltaTime = 0;
+        static float   ya2d_FPS = 0.0f;
     //ya2d
-        static u8 ya2d_inited = 0;
+        static u8  ya2d_inited = 0;
 
 /* Functions */
 
@@ -64,6 +65,8 @@
             pspDebugScreenInit();
             ya2d_updateConsole();
 
+
+		ya2d_currentTime = ya2d_lastTime = ya2d_millis();
         ya2d_inited = 1;
         sceKernelDcacheWritebackAll();
         return 1;
@@ -73,9 +76,9 @@
     int ya2d_deinit()
     {
         sceGuTerm();
-        vfree(vabsptr(ya2d_fbp0));
-        vfree(vabsptr(ya2d_fbp1));
-        vfree(vabsptr(ya2d_zbp));
+        vfree(vabsptr(ya2d_fbp0)); ya2d_fbp0 = NULL;
+        vfree(vabsptr(ya2d_fbp1)); ya2d_fbp1 = NULL;
+        vfree(vabsptr(ya2d_zbp));  ya2d_zbp  = NULL;
         ya2d_inited = 0;
         return 1;
     }
@@ -106,8 +109,22 @@
         sceGuSync(0,0);
        // sceDisplayWaitVblankStart();
         ya2d_fbp0 = sceGuSwapBuffers();
-        
+        //FPS counting
+			ya2d_frameCount++;
+			ya2d_currentTime = ya2d_millis();
+			ya2d_deltaTime = ya2d_currentTime - ya2d_lastTime;
+			if(ya2d_deltaTime >= 1000)
+			{
+				ya2d_FPS = (float)ya2d_frameCount/((float)ya2d_deltaTime/1000.0f);
+				ya2d_frameCount = 0;
+				ya2d_lastTime = ya2d_millis();
+			}       
     }
+    
+    float ya2d_getFPS()
+    {
+		return ya2d_FPS;
+	}
 
     void ya2d_updateConsole()
     {

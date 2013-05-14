@@ -24,9 +24,6 @@
 	extern u32 jpegimg_jpg_size;
 	
 
-u32 frames;
-u64 current_millis, last_millis, delta_millis;
-
 PSP_MODULE_INFO("ya2d", PSP_MODULE_USER, 1, 1);
 PSP_HEAP_SIZE_MAX();
 
@@ -34,7 +31,6 @@ int main(int argc, char *argv[])
 {
 	SetupCallbacks();
 	ya2d_init();
-	initFPS();
 
 	ya2d_Texture *tex1, *tex2, *tex3, *jpeg;
 	
@@ -58,30 +54,31 @@ int main(int argc, char *argv[])
 	if(! (jpeg = ya2d_loadJPEGfromBuffer(jpegimg_jpg_start, jpegimg_jpg_size, YA2D_VRAM)))
 		ya2d_error("Error loading jpegimg.jpg");
 
-	float angle = 0.0f, fps = 0.0f;
 	ya2d_swizzleTexture(tex1);
 	ya2d_swizzleTexture(tex2);
 	ya2d_swizzleTexture(tex3);
 	ya2d_swizzleTexture(jpeg);
+
+	float angle = 0.0f;
+	int x = 270, y = 40;
 	while(1)
 	{   
         ya2d_clearScreen(0xFFFFFFFF); //white
-		printf("FPS: %.2f   angle: %f  ", fps, angle);
+		printf("FPS: %.2f   angle: %f  ", ya2d_getFPS(), angle);
 		printf("vram: %.2f KB", ((float)vlargestblock()/1024));
 
-		ya2d_drawFillRect(40, 140, 50, 20, GU_RGB(255,0,0));
-		ya2d_drawRect(109, 140, 20, 80, GU_RGB(0,0,255));
+
+		ya2d_drawRotateTexture(jpeg, 20, 10, angle);
+		ya2d_drawRotateTexture(tex1, 250, 60, angle);
+		ya2d_drawRotateTexture(tex2, 20, 10, angle);
+		ya2d_drawRotateTexture(tex3, x,y, angle);
+		ya2d_drawRect(x, y, 64,64,0xFF0000FF);
 		
-		ya2d_drawTextureFast(tex3, 50, 60);
-		ya2d_drawTextureFast(tex1, 150, 10);
-		ya2d_drawTextureFast(tex2, 240, 60);
-		ya2d_drawTextureFast(jpeg, 20, 10);
-		
-		angle += 0.15f;
+		angle += 0.01f;
 		ya2d_flipScreen();
 		ya2d_updateConsole();
-		FPS(&fps);
 	}
+	
     ya2d_freeTexture(tex1);
     ya2d_freeTexture(tex2);
     ya2d_freeTexture(tex3);
