@@ -36,10 +36,10 @@
 		sceGuEnable(GU_ALPHA_TEST);
 		sceGuEnable(GU_SCISSOR_TEST);
 		sceGuEnable(GU_BLEND);
+		sceGuEnable(GU_TEXTURE_2D);
 
 		sceGuFrontFace(GU_CW);
 		sceGuShadeModel(GU_SMOOTH);
-		sceGuDisable(GU_TEXTURE_2D);
 
 		sceGuAlphaFunc(GU_GREATER, 0, 255);
         sceGuDepthFunc(GU_LEQUAL);

@@ -74,6 +74,7 @@ int main(int argc, char *argv[])
 		ya2d_drawRotateTexture(tex3, x,y, angle);
 		ya2d_drawRect(x, y, 64,64,0xFF0000FF);
 		
+		
 		angle += 0.01f;
 		ya2d_flipScreen();
 		ya2d_updateConsole();

@@ -50,21 +50,21 @@ typedef struct
 
 typedef struct
 {
-	uint32_t imageWidth, imageHeight;
-	uint32_t textureWidth, textureHeight;
-	uint32_t centerX, centerY;
+	int imageWidth, imageHeight;
+	int textureWidth, textureHeight;
+	int centerX, centerY;
     uint32_t rowBytes, dataLength;
-	void *rel_ptr, *data; //data is absolute pointer
+	void *rel_ptr, *data; //data is absolute VRAM pointer
 	int bitDepth, colorType, texPSM;
 	uint8_t hasAlpha, isSwizzled;
 	ya2d_Place place;
 }ya2d_Texture;
 
+
 ya2d_Texture* ya2d_createTexture(int w, int h, int psm, ya2d_Place place);
 void ya2d_swizzleTexture(ya2d_Texture *texp);
 inline void ya2d_setTexture(ya2d_Texture *texp);
 void ya2d_drawTexture(ya2d_Texture *texp, int x, int y);
-void ya2d_drawTextureFast(ya2d_Texture *texp, int x, int y);
 void ya2d_drawRotateTexture(ya2d_Texture *texp, int x, int y, float angle);
 void ya2d_freeTexture(ya2d_Texture *texp);
 

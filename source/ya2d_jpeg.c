@@ -57,7 +57,6 @@ exit_error:
 
 ya2d_Texture* ya2d_loadJPEGfromBuffer(void* buffer, u32 buffer_size, ya2d_Place place)
 {
-	FILE       *fp;
 	JSAMPARRAY jpegLine;
 	uint8_t    *jpegLineP;
 	int        jpegRowBytes, y, x;
