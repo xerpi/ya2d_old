@@ -75,6 +75,7 @@ int main(int argc, char *argv[])
 		ya2d_drawRect(x, y, 64,64,0xFF0000FF);
 		
 		if(ya2d_Controls.held->cross) ya2d_drawFillRect(0,0,480,272,0xFF00FF00);
+		if(ya2d_Controls.held->circle) angle += 0.1f;
 			
 		angle += 0.01f;
 		ya2d_flipScreen();

@@ -52,14 +52,16 @@ typedef struct
 	unsigned int ms       : 1;
 }__attribute__ ((packed)) ya2d_Buttons_t;
 
-struct
+struct ya2d_Controls_t
 {
 	ya2d_Buttons_t*  held;
 	ya2d_Buttons_t*  pressed;
 	ya2d_Buttons_t*  released;
 	unsigned char*   analogx;
 	unsigned char*   analogy;
-}ya2d_Controls;
+};
+
+struct ya2d_Controls_t ya2d_Controls;
 
 
 #define ya2d_micros() sceKernelLibcClock()
